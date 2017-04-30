@@ -5,12 +5,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import DTO.Contact;
 import DTO.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.ArrayList;
 import java.util.List;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
@@ -93,9 +95,25 @@ public class userDAO {
 //               
 //                    jsonArray.add(JsonObj);
 //                }
-                jsonObject.addProperty("result",gson.toJson(userss));
+                jsonObject.addProperty("result",getAllcontacts(email));
             }
         }
         return new Gson().toJson(jsonObject);
+    }
+    
+    
+    private String getAllcontacts(String email){
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query query1 = entityManager.createNamedQuery("User.findByEmail").setParameter("email", email);
+        User user = (User) query1.getSingleResult();
+        Query query = entityManager.createNamedQuery("Contact.findByUserId").setParameter("userId", user.getId());
+        List<Contact> contacts = query.getResultList();
+        ArrayList<User> users = new ArrayList<>();
+        for (Contact contact : contacts) {
+            Query query2 = entityManager.createNamedQuery("User.findById").setParameter("id", contact.getContactPK().getContactId());
+            User user2 = (User) query2.getSingleResult();
+            users.add(user2);
+        }
+        return new Gson().toJson(users);
     }
 }
