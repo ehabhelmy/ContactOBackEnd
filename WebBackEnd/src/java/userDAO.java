@@ -95,14 +95,14 @@ public class userDAO {
 //               
 //                    jsonArray.add(JsonObj);
 //                }
-                jsonObject.addProperty("result",getAllcontacts(email));
+                jsonObject.add("result", getAllcontacts(email));
             }
         }
         return new Gson().toJson(jsonObject);
     }
     
     
-    private String getAllcontacts(String email){
+    private JsonArray getAllcontacts(String email){
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         Query query1 = entityManager.createNamedQuery("User.findByEmail").setParameter("email", email);
         User user = (User) query1.getSingleResult();
@@ -114,6 +114,6 @@ public class userDAO {
             User user2 = (User) query2.getSingleResult();
             users.add(user2);
         }
-        return new Gson().toJson(users);
+        return (JsonArray) new Gson().toJsonTree(users);
     }
 }
